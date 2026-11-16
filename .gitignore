@@ -5,6 +5,14 @@
 /share/
 /pyvenv.cfg
 
+# 通用虚拟环境目录（队友机器上可能叫 venv / .venv / env）
+venv/
+.venv/
+env/
+ENV/
+virtualenv/
+pyvenv.cfg
+
 # Python
 __pycache__/
 *.py[cod]
