@@ -95,3 +95,53 @@ def hsv_color_square (frame,high:list,low:list) :
     else :
         return None
 
+
+#寻找在水平方向上离中心最近的原，传入帧，传出圆心，没有return None
+def find_nearest_circle(frame) :
+    gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+    kernel = np.ones((3, 3), np.uint8)
+    gray = cv2.morphologyEx(gray,cv2.MORPH_OPEN,kernel)
+    gray = cv2.morphologyEx(gray,cv2.MORPH_CLOSE,kernel)
+
+    #二值化阈值可能要调，参考（110，150）
+    ret,binary = cv2.threshold(gray,130,255,type=cv2.THRESH_BINARY)
+
+    contours , hierarchy = cv2.findContours(binary,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
+
+    center_list = list()
+
+    for contour in contours :
+
+        # 面积筛，之后测试需要完善
+        s = cv2.contourArea(contour)
+        if s < 5000 or s > 60000 :
+            continue
+
+        epsilon = 0.04 * cv2.arcLength(contour,True)
+        approx = cv2.approxPolyDP(contour,epsilon,True)
+        
+        corners = len(approx)
+        if corners > 5 :
+            (cx, cy), radius = cv2.minEnclosingCircle(contour)
+            (cx, cy) = (int(cx), int(cy))
+            center_list.append((cx, cy))
+
+
+    count = len(center_list)
+    if count > 1 :
+        dist_dict = dict()
+        for i in center_list :
+            dx = i[0] - 320
+            if dx >= 0 :
+                dist_dict[i] = dx
+            else :
+                dist_dict[i] = -dx
+
+        min_key = min(dist_dict, key=dist_dict.get)
+
+        return min_key
+
+    elif count == 1 :
+        return center_list[0]
+    else :
+        return None
