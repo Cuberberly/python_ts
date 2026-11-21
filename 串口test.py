@@ -1,14 +1,14 @@
 import serial
 import time
 
-ser = serial.Serial(port='dev/ttyS3',baudrate = 115200)
+ser = serial.Serial(port='dev/ttyS3',baudrate = 115200,timeout= 0.1)
 
 while True :
     ser.write("test".encode("utf_8"))
     time.sleep(0.5)
 
     for i in range(5) :
-        line = ser.readline(0.1)     
+        line = ser.readline()     
         if not line:
             continue                    
         text = line.decode("ascii", "replace")
